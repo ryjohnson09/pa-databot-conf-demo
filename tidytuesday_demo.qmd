@@ -1,0 +1,43 @@
+---
+title: "TidyTuesday Demo"
+format: html
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(tidyverse)
+library(scales)
+
+# Load the data from TidyTuesday - Weekly US Gas Prices
+tuesdata <- tidytuesdayR::tt_load('2025-07-01')
+gas_prices <- tuesdata$gas_prices
+```
+
+```{r}
+# Create Plot
+gas_prices |>
+  filter(!is.na(price), !is.na(date)) |>
+  mutate(date = as.Date(date)) |>
+  filter(fuel == "gasoline", grade == "regular") |> 
+  ggplot(aes(x = Date, y = price)) +
+  geom_area(fill = "#3498db", alpha = 0.2) + 
+  geom_line(color = "#2980b9", linewidth = 1.5) +
+  geom_point(color = "#2980b9", size = 1.5, alpha = 0.7) +
+  labels(
+    title = "US Regular Gasoline Prices Over Time",
+    subtitle = "Weekly retail prices showing volatility and trends",
+    x = NULL, 
+    y = "Price per Gallon (USD)"
+  ) +
+  theme_minimal(base_family = "Arial") +  
+  theme(
+    plot.title = element_text(size = 18, face = "bold"),
+    plot.subtitle = element_text(size = 13, color = "grey50"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid.minor = element_blank()
+  ) +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_x_date(date_breaks = "2 years", date_labels = "%Y")
+```
